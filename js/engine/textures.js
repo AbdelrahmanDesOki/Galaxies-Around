@@ -131,17 +131,28 @@ export function gasGiantTexture(body) {
     const c = makeCanvas(w, h);
     const ctx = c.getContext('2d');
     const base = new THREE.Color(body.color);
-    let y = 0;
-    while (y < h) {
-      const band = 8 + Math.random() * 34;
-      const l = (Math.random() - 0.5) * 0.22;
-      const col = base.clone(); col.offsetHSL(0, 0, l);
-      ctx.fillStyle = hex(col.getHex());
-      ctx.fillRect(0, y, w, band + 1);
-      y += band;
+    // smooth latitude bands: a vertical gradient with many soft stops
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    let stop = 0;
+    while (stop < 1) {
+      const l = (Math.random() - 0.5) * 0.2;
+      const col = base.clone(); col.offsetHSL(0, (Math.random() - 0.5) * 0.04, l);
+      grad.addColorStop(Math.min(stop, 1), hex(col.getHex()));
+      stop += 0.02 + Math.random() * 0.07;
     }
-    // soften with horizontal swirl streaks
-    splatter(ctx, w, h, shade(body.color, 0.08), 400, 3, 10, 0.25);
+    grad.addColorStop(1, hex(base.getHex()));
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    // faint horizontal streaks for storm-belt turbulence
+    for (let i = 0; i < 260; i++) {
+      const y = Math.random() * h;
+      const x = Math.random() * w;
+      const len = 30 + Math.random() * 180;
+      ctx.globalAlpha = 0.05 + Math.random() * 0.08;
+      ctx.fillStyle = shade(body.color, (Math.random() - 0.5) * 0.25);
+      ctx.fillRect(x, y, len, 1 + Math.random() * 3);
+    }
+    ctx.globalAlpha = 1;
     // Jupiter's Great Red Spot
     if (body.id === 'jupiter') {
       ctx.globalAlpha = 0.85;

@@ -68,7 +68,8 @@ function frameLevel(lvl, entryDist) {
   controls.target.copy(lvl.bounds.target);
   const dir = lvl.bounds.viewDir.clone().normalize();
   camera.position.copy(lvl.bounds.target).addScaledVector(dir, entryDist);
-  controls.minDistance = lvl.bounds.minDist * 0.5;
+  // keep the camera just outside the central body's surface
+  controls.minDistance = lvl.bounds.minDist * 0.9;
   controls.maxDistance = lvl.bounds.maxDist;
   controls.update();
 }
@@ -104,11 +105,13 @@ function flyTo(object, radius, factor = 3.2) {
   tmp.copy(camera.position).sub(controls.target);
   if (tmp.lengthSq() < 1e-6) tmp.copy(levels[current].bounds.viewDir);
   tmp.normalize();
-  const dist = Math.max(radius * factor, levels[current].bounds.minDist * 0.6);
+  const dist = radius * factor;
   fly.toPos.copy(fly.toTgt).addScaledVector(tmp, dist);
   fly.fromPos.copy(camera.position);
   fly.fromTgt.copy(controls.target);
   fly.t = 0; fly.active = true;
+  // let the camera wheel right down to (but never through) this object's surface
+  controls.minDistance = Math.max(radius * 1.05, 1e-3);
 }
 
 function updateFly(dt) {
@@ -209,6 +212,9 @@ function maybeTransition(zoomingOut) {
     transitionLock = performance.now() + 700;
     enterLevel(current + 1, 'fromInner');
   } else if (!zoomingOut && dist <= lvl.bounds.minDist + 1e-3 && current > 0) {
+    // only dive to the inner scale when focused on the level's own centre —
+    // when orbiting a clicked planet, zooming in just approaches its surface
+    if (controls.target.distanceTo(lvl.bounds.target) > lvl.bounds.minDist * 0.5) return;
     transitionLock = performance.now() + 700;
     enterLevel(current - 1, 'fromOuter');
   }

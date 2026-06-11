@@ -46,7 +46,7 @@ No installation, no build step, **no internet required** — Three.js is vendore
 - 🛰️ **Zoom to the surface** — drop down onto planetary surfaces, or dive *inside* the Milky Way and the Local Group.
 - 🔭 **Smart zoom** — scroll/pinch to zoom in and out; cross a scale boundary and you're carried to the next level automatically.
 - 🧭 **Scale ladder + search** — jump straight to any scale, or type a name ("Mars", "Sirius", "Andromeda") to fly there instantly.
-- 🌍 **Procedural & offline** — textured Earth with clouds & atmosphere, banded gas giants, ringed Saturn, a glowing Sun, spiral-arm galaxies and a clustered cosmic web — all generated on a `<canvas>`, no external assets.
+- 🌍 **Photorealistic Earth & Moon** — real NASA Blue Marble imagery with terrain relief, glinting oceans, a live cloud layer and city lights glowing on the night side. Gas giants, the Sun, galaxies and the cosmic web are generated procedurally — everything ships with the repo and works offline.
 - ⚡ **Zero build, zero dependencies to install** — just open it in a modern browser.
 
 <div align="center">
@@ -54,6 +54,10 @@ No installation, no build step, **no internet required** — Three.js is vendore
 ![Info panel](docs/screenshots/info-panel.png)
 
 *Click any body for a NASA-sourced fact sheet — and a button to zoom onto its surface.*
+
+![Earth surface](docs/screenshots/earth-surface.png)
+
+*Zoom all the way down: real NASA satellite imagery, right to the coastline.*
 
 </div>
 
@@ -134,6 +138,7 @@ All figures are drawn from public NASA / JPL resources, including:
 - [NASA Planetary Fact Sheets (NSSDC)](https://nssdc.gsfc.nasa.gov/planetary/factsheet/)
 - [NASA Science — Solar System & Universe](https://science.nasa.gov/)
 - [NASA / ESA imagery and the Gaia stellar catalogue](https://science.nasa.gov/mission/hubble/)
+- Earth & Moon texture maps: NASA Blue Marble / Visible Earth, via the MIT-licensed [three.js examples](https://github.com/mrdoob/three.js/tree/master/examples/textures/planets) (vendored in `assets/textures/planets/`)
 
 > **A note on scale:** the *real* universe is overwhelmingly empty space. Distances and sizes are gently compressed so that everything stays visible and explorable — the facts in every panel, however, are real.
 

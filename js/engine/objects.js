@@ -5,30 +5,68 @@ import {
   sunTexture, galaxySprite, glowSprite, ringTexture,
 } from './textures.js';
 
+// ---------- Real NASA imagery (with procedural fallback) ----------
+// Earth & Moon use NASA Blue Marble / Visible Earth derived maps vendored
+// in assets/textures/planets. If a map fails to load (e.g. file moved),
+// the procedural canvas texture takes over so the app never breaks.
+const TEX_BASE = './assets/textures/planets/';
+const texLoader = new THREE.TextureLoader();
+
+function realMap(file, { srgb = true, onFail } = {}) {
+  const tex = texLoader.load(TEX_BASE + file, undefined, undefined, () => onFail && onFail());
+  if (srgb) tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 16;
+  return tex;
+}
+
+// Photorealistic Earth: 4K day map + terrain relief + glinting oceans +
+// real cloud layer + night-side city lights.
+function makeRealEarth(data, radius) {
+  const mat = new THREE.MeshPhongMaterial({
+    specular: new THREE.Color(0x444444),
+    shininess: 22,
+    emissive: new THREE.Color(0xffffff),
+    emissiveIntensity: 0.65,
+  });
+  mat.map = realMap('earth_atmos_4096.jpg', {
+    onFail: () => { mat.map = earthTexture(); mat.normalMap = mat.specularMap = mat.emissiveMap = null; mat.needsUpdate = true; },
+  });
+  mat.normalMap = realMap('earth_normal_2048.jpg', { srgb: false });
+  mat.normalScale = new THREE.Vector2(0.85, 0.85);
+  mat.specularMap = realMap('earth_specular_2048.jpg', { srgb: false });
+  mat.emissiveMap = realMap('earth_lights_2048.png');
+
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 96, 96), mat);
+  mesh.rotation.z = THREE.MathUtils.degToRad(data.axialTilt || 0);
+
+  const cloudMat = new THREE.MeshLambertMaterial({ transparent: true, depthWrite: false });
+  cloudMat.map = realMap('earth_clouds_2048.png', {
+    onFail: () => { cloudMat.map = cloudTexture(); cloudMat.opacity = 0.55; cloudMat.needsUpdate = true; },
+  });
+  const clouds = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.008, 96, 96), cloudMat);
+  clouds.name = 'clouds';
+  mesh.add(clouds);
+  mesh.add(atmosphere(radius, 0x6cc6ff));
+  return mesh;
+}
+
 // A solid celestial body (planet / moon). `data` drives which texture to use.
 export function makeBody(data, radius) {
-  const geo = new THREE.SphereGeometry(radius, 48, 48);
-  let map;
-  if (data.id === 'earth') map = earthTexture();
-  else if (data.banded || data.id === 'uranus' || data.id === 'neptune') map = gasGiantTexture(data);
-  else map = rockyTexture(data);
+  if (data.id === 'earth') return makeRealEarth(data, radius);
 
-  const mat = new THREE.MeshStandardMaterial({
-    map, roughness: 0.9, metalness: 0.0,
-  });
+  const geo = new THREE.SphereGeometry(radius, 64, 64);
+  const mat = new THREE.MeshStandardMaterial({ roughness: 0.95, metalness: 0.0 });
+  if (data.id === 'moon') {
+    mat.map = realMap('moon_1024.jpg', {
+      onFail: () => { mat.map = rockyTexture(data); mat.needsUpdate = true; },
+    });
+  } else if (data.banded || data.id === 'uranus' || data.id === 'neptune') {
+    mat.map = gasGiantTexture(data);
+  } else {
+    mat.map = rockyTexture(data);
+  }
   const mesh = new THREE.Mesh(geo, mat);
   mesh.rotation.z = THREE.MathUtils.degToRad((data.axialTilt || 0) % 180);
-
-  // Earth gets a cloud shell + atmosphere glow.
-  if (data.id === 'earth') {
-    const clouds = new THREE.Mesh(
-      new THREE.SphereGeometry(radius * 1.012, 48, 48),
-      new THREE.MeshStandardMaterial({ map: cloudTexture(), transparent: true, opacity: 0.55, depthWrite: false })
-    );
-    clouds.name = 'clouds';
-    mesh.add(clouds);
-    mesh.add(atmosphere(radius, 0x6cc6ff));
-  }
   if (data.rings) mesh.add(makeRings(data, radius));
   return mesh;
 }
