@@ -8,11 +8,12 @@ export function createEarthLevel() {
   const group = new THREE.Group();
   const earthData = PLANETS.find((p) => p.id === 'earth');
 
-  // soft sunlight from one side
-  const sun = new THREE.DirectionalLight(0xffffff, 2.4);
+  // sunlight from one side; ambient kept low so the night side stays dark
+  // and the real city-lights map can glow against it
+  const sun = new THREE.DirectionalLight(0xffffff, 2.6);
   sun.position.set(8, 3, 6);
   group.add(sun);
-  group.add(new THREE.AmbientLight(0x223355, 1.1));
+  group.add(new THREE.AmbientLight(0x223355, 0.35));
 
   const earth = makeBody(earthData, 1);
   pickable(earth, { ...earthData, hasSurface: true }, 1, { spinSpeed: 0.06 });
