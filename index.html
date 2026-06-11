@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galaxies Around — A Universe Simulator</title>
+  <meta name="description" content="An interactive simulator that travels from Earth to the Milky Way and out to the observable universe, using real NASA data." />
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Three.js is vendored locally (vendor/three) — no build step, no CDN, works offline -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three/three.module.js",
+      "three/addons/": "./vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- 3D canvas -->
+  <div id="viewport"></div>
+
+  <!-- Loading overlay -->
+  <div id="loading">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Charting the cosmos…</div>
+  </div>
+
+  <!-- Top bar: current scale + distance readout -->
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-mark">✦</span>
+      <span class="brand-name">Galaxies&nbsp;Around</span>
+    </div>
+    <div id="scale-readout">
+      <div id="level-name">Earth</div>
+      <div id="level-scale">— km across</div>
+    </div>
+    <div class="topbar-actions">
+      <input id="search" list="search-list" placeholder="Fly to… (e.g. Mars, Sirius, Andromeda)" autocomplete="off" />
+      <datalist id="search-list"></datalist>
+      <button id="help-btn" title="Help">?</button>
+    </div>
+  </header>
+
+  <!-- Scale ladder (left) -->
+  <nav id="ladder" aria-label="Cosmic scale ladder"></nav>
+
+  <!-- Zoom controls (right) -->
+  <div id="zoom-controls">
+    <button id="zoom-in" title="Zoom in">+</button>
+    <button id="zoom-out" title="Zoom out">−</button>
+    <button id="reset-view" title="Reset view">⌖</button>
+  </div>
+
+  <!-- Hover tooltip -->
+  <div id="tooltip" hidden></div>
+
+  <!-- Info panel (right) -->
+  <aside id="info-panel" hidden>
+    <button id="info-close" title="Close">×</button>
+    <div id="info-content"></div>
+  </aside>
+
+  <!-- Help modal -->
+  <div id="help-modal" hidden>
+    <div class="modal-card">
+      <button id="help-close" title="Close">×</button>
+      <h2>How to explore</h2>
+      <ul>
+        <li><b>Scroll / pinch</b> — zoom in and out. Zoom past an edge to jump to the next cosmic scale.</li>
+        <li><b>Drag</b> — orbit the view. <b>Right-drag</b> — pan.</li>
+        <li><b>Click</b> any star, planet or galaxy to fly to it and read its NASA facts.</li>
+        <li><b>“Land on surface”</b> in the info panel drops you onto a planet (where available).</li>
+        <li><b>Scale ladder</b> (left) jumps between Earth → Solar System → Interstellar → Milky Way → Local Group → Observable Universe.</li>
+        <li><b>Search</b> (top right) flies you straight to any named object.</li>
+      </ul>
+      <p class="modal-note">Distances, sizes and facts are drawn from NASA / JPL public data. Scales are compressed for visibility — a true-to-scale universe would be mostly empty space.</p>
+    </div>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
