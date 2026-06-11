@@ -59,20 +59,25 @@ No installation, no build step, **no internet required** — Three.js is vendore
 
 ## 🚀 Quick start
 
-Because the app uses ES modules, it needs to be served over `http://` (not opened as a `file://`). Any static server works:
+Because the app uses ES modules, it needs to be served over `http://` (not opened as a `file://`). Any static server works — use whichever you already have installed:
 
 ```bash
 # clone
 git clone https://github.com/AbdelrahmanDesOki/galaxies-around.git
 cd galaxies-around
 
-# then serve with ANY of these:
-npx http-server -p 8080        # Node
-python3 -m http.server 8080    # Python
+# then serve with ANY ONE of these:
+python -m http.server 8080     # Python 3 (already on most systems)
+python3 -m http.server 8080    # Python 3 (if `python` isn't found)
 php -S localhost:8080          # PHP
+npx http-server -p 8080        # Node.js (npx ships with Node — install from nodejs.org)
 ```
 
+No terminal? In **VS Code**, install the **Live Server** extension, then right-click `index.html` → **Open with Live Server**.
+
 Now open **http://localhost:8080** and start exploring. 🌠
+
+> ⚠️ Don't open `index.html` directly as a `file://` page — browsers block ES-module loading over `file://`, so it must be served over `http://`.
 
 ## 🎮 Controls
 
